@@ -9,3 +9,8 @@
 */
 
 #include "APF.h"
+#include "FractionalDelay.hpp"
+
+APF::APF() {
+
+};
