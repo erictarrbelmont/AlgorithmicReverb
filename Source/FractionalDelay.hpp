@@ -31,7 +31,6 @@ public:
     
     void setSpeed(float speed);
     void setDepth(float depth);
-
     
 private:
     
@@ -48,8 +47,6 @@ private:
     
     float currentAngle[2] = {0.0f};
     float angleChange = speed * (1.f/Fs) * 2.f * M_PI;
-    
-    
     
 };
 

@@ -9,3 +9,15 @@
 */
 
 #pragma once
+#include "FractionalDelay.hpp"
+
+class FBCF {
+public:
+    
+    float processSample(float x, int channel);
+    
+private:
+    
+    FractionalDelay fracDelay;
+    
+};
