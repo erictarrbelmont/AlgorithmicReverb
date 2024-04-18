@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="n4YGcj" name="AlgorithmicReverb" projectType="audioplug"
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
-              pluginFormats="buildAU,buildStandalone">
+              pluginFormats="buildAU,buildStandalone" displaySplashScreen="1">
   <MAINGROUP id="OfYlnz" name="AlgorithmicReverb">
     <GROUP id="{D158933A-FFAF-5E46-C469-E609A22EC1E0}" name="Source">
       <FILE id="DNkbHx" name="PluginProcessor.cpp" compile="1" resource="0"
