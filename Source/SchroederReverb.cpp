@@ -10,7 +10,6 @@
 
 #include "SchroederReverb.h"
 
-
 float SchroederReverb::processSample (float x, const int channel) {
     
     // Work in progress
@@ -22,10 +21,10 @@ float SchroederReverb::processSample (float x, const int channel) {
     fourthDelayBlock.setGain(FBGain);
     
     // Processing the sample through each of the FBCF blocks in parallel
-    float a = firstDelayBlock.processSample(x,channel);
-    float b = secondDelayBlock.processSample(x,channel);
-    float c = thirdDelayBlock.processSample(x,channel);
-    float d = fourthDelayBlock.processSample(x,channel);
+    float a = firstDelayBlock.processSample(x, channel);
+    float b = secondDelayBlock.processSample(x, channel);
+    float c = thirdDelayBlock.processSample(x, channel);
+    float d = fourthDelayBlock.processSample(x, channel);
     
     // Summing together all the parts
     float processedFBCF = a + b + c + d;
@@ -35,8 +34,8 @@ float SchroederReverb::processSample (float x, const int channel) {
     secondAPFFilter.setGain(APGain);
     
     // Processing the combined sum of the FBCF blocks through the APF in series
-    float e = firstAPFFilter.processSample(processedFBCF,channel);
-    float processedAPF = secondAPFFilter.processSample(e,channel);
+    float e = firstAPFFilter.processSample(processedFBCF, channel);
+    float processedAPF = secondAPFFilter.processSample(e, channel);
     
     return processedAPF;
     
@@ -46,5 +45,6 @@ void SchroederReverb::process (float * buffer, const int N, const int c) {
     for (int n = 0 ; n < N ; n++) {
         float x = buffer[n];
         float y = processSample(x,c);
+        buffer[n] = y;
     }
 }
