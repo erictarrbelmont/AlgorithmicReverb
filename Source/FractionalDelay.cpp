@@ -55,7 +55,7 @@ float FractionalDelay::processSample(float x, int channel){
     
     float y = g1 * delayBuffer[indexD1][channel] + g2 * delayBuffer[indexD2][channel];
     
-    delayBuffer[index[channel]][channel] = x;
+    delayBuffer[index[channel]][channel] = y; // "x" for ff, "y" for fb (?)
     
     if (index[channel] < MAX_BUFFER_SIZE - 1){
         index[channel]++;
