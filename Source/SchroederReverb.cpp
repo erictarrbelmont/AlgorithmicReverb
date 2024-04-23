@@ -9,10 +9,9 @@
 */
 
 #include "SchroederReverb.h"
-<<<<<<< Updated upstream
-=======
 
-void processSample (float x, const int c) { // may need to implement the set 
+
+void processSample (float x, const int c) { // may need to implement the set
     
     // Work in progress
     
@@ -45,5 +44,4 @@ void process (float * buffer, const int N, const int c) {
     for (int n = 0 ; n < N ; n++) {
         float x = buffer[n];
         float y = processSample(x, c);
-}
->>>>>>> Stashed changes
+
