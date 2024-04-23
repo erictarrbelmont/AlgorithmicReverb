@@ -60,7 +60,7 @@ float FBCF::getGain() {
     return gain;
 }
 
-float FBCF::processSample(float x, int channel, float gain) {
+float FBCF::processSample(float x, int channel) {
     
     fbVar = x - gain * y[channel];
     y[channel] = fracDelay.processSample(fbVar,channel);

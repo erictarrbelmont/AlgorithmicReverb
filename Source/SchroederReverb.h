@@ -33,10 +33,10 @@ public:
     }
     
     // Processing by sample
-    void processSample (float x, const int c) {}
+    float processSample(float x, const int channel);
     
     // Processing by buffer
-    void process (float * buffer, const int N, const int c) {}
+    void process(float * buffer, const int N, const int channel);
     
     
 private:
