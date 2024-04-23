@@ -8,7 +8,8 @@
 #ifndef FractionalDelay_hpp
 #define FractionalDelay_hpp
 
-#include <cmath>
+#define _USE_MATH_DEFINES
+#include <math.h>
 using namespace std;
 
 class FractionalDelay {
