@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "SchroederReverb.h"
 
 //==============================================================================
 /**
@@ -53,7 +54,21 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    juce::AudioProcessorValueTreeState apvts;
+    
+    static const juce::StringRef temp;
+    
+    void tempChanged(float value, int channel);
+    
+    
 private:
+    
+    SchroederReverb schroederReverb;
+    
+    juce::AudioProcessorValueTreeState::ParameterLayout createParams();
+    
+    int ParameterVersionHint = 1;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AlgorithmicReverbAudioProcessor)
 };

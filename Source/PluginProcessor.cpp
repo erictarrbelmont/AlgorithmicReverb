@@ -9,6 +9,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+const juce::StringRef SchroederReverb::temp = "temp";
+
 //==============================================================================
 AlgorithmicReverbAudioProcessor::AlgorithmicReverbAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -21,12 +23,25 @@ AlgorithmicReverbAudioProcessor::AlgorithmicReverbAudioProcessor()
                      #endif
                        )
 #endif
+apvts(*this, nullptr, "Params", createParams())
 {
 }
 
 AlgorithmicReverbAudioProcessor::~AlgorithmicReverbAudioProcessor()
 {
 }
+
+juce::AudioProcessorValueTreeState::ParameterLayout SchroederReverb::createParams()
+{
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{temp, ParameterVersionHint}, "Low Threshold", -96.f, 0.f, 0.f));
+    
+    return {params.begin(), params.end()};
+    
+}
+
+
 
 //==============================================================================
 const juce::String AlgorithmicReverbAudioProcessor::getName() const
@@ -93,8 +108,7 @@ void AlgorithmicReverbAudioProcessor::changeProgramName (int index, const juce::
 //==============================================================================
 void AlgorithmicReverbAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    schroederReverb.prepare(sampleRate);
 }
 
 void AlgorithmicReverbAudioProcessor::releaseResources()
@@ -150,11 +164,14 @@ void AlgorithmicReverbAudioProcessor::processBlock (juce::AudioBuffer<float>& bu
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
+    
+    auto numSamples = buffer.getNumSamples();
+    
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
 
-        // ..do something to the data...
+        schroederReverb.process(channelData, numSamples, channel);
     }
 }
 
@@ -172,15 +189,20 @@ juce::AudioProcessorEditor* AlgorithmicReverbAudioProcessor::createEditor()
 //==============================================================================
 void AlgorithmicReverbAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    auto currentState = apvts.copyState();
+    
+    std::unique_ptr<juce::XmlElement> xml (currentState.createXml());
+    
+    copyXmlToBinary(*xml, destData);
 }
 
 void AlgorithmicReverbAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xml (getXmlFromBinary(data, sizeInBytes));
+    
+    juce::ValueTree newTree = juce::ValueTree::fromXml(*xml);
+    
+    apvts.replaceState(newTree);
 }
 
 //==============================================================================
