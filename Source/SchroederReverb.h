@@ -33,18 +33,17 @@ public:
     }
     
     // Processing by sample
-    void processSample (float x, const int c) {}
+    float processSample (float x, const int c) ;
     
     // Processing by buffer
-    void process (float * buffer, const int N, const int c) {}
+    float process (float * buffer, const int N, const int c) ;
     
+    float FBGain = 0.f; // Affects length of reverb, one value will be applied to all intances of FBCF
+    float APGain = 0.f; // Affects Diffusion, one value will be applied to all intances of APF
     
 private:
     
     double Fs = 48000.f;
-    
-    float FBGain = 0.f; // Affects length of reverb, one value will be applied to all intances of FBCF
-    float APGain = 0.f; // Affects Diffusion, one value will be applied to all intances of APF
     
     // Intances for each FBCF and APF filters labeled accordingly
     FBCF firstDelayBlock;
