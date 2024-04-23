@@ -31,7 +31,7 @@ public:
     void setGain(float gain);
     float getGain();
     
-    float processSample(float x, int channel, float g);
+    float processSample(float x, int channel);
     
 private:
     
