@@ -31,16 +31,16 @@ public:
     void setAPGain(float inputGain) {
         APGain = inputGain;
     }
-    
-    // Processing by sample
-    void processSample (float x, const int c);
+
+
+    float processSample(float x, const int channel);
     
     // Processing by buffer
-    void process (float * buffer, const int N, const int c);
+    void process(float * buffer, const int N, const int channel);
+
     
     float FBGain = 0.f; // Affects length of reverb, one value will be applied to all intances of FBCF
     float APGain = 0.f; // Affects Diffusion, one value will be applied to all intances of APF
-    
     
 private:
     
