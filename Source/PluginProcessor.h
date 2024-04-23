@@ -68,6 +68,8 @@ private:
     
   //  juce::SharedResourcePointer<SharedImages>     m_pSharedImagesPtr;
     
+    int dryWet = 50;
+    
     SchroederReverb schroederReverb;
     
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();

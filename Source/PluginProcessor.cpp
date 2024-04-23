@@ -166,6 +166,8 @@ void AlgorithmicReverbAudioProcessor::processBlock (juce::AudioBuffer<float>& bu
     
     auto numSamples = buffer.getNumSamples();
     
+    double d_dryWet = dryWet / 100;
+    
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
@@ -178,15 +180,19 @@ void AlgorithmicReverbAudioProcessor::processBlock (juce::AudioBuffer<float>& bu
         
         schroederReverb.setAPGain(smoothedDiffusion[channel]);
         
-        smoothedDryWet[channel] = alpha * smoothedDryWet[channel] + (1.f - alpha) * schroederReverb.APGain;
+        smoothedDryWet[channel] = alpha * smoothedDryWet[channel] + (1.f - alpha) * d_dryWet;
         
-        schroederReverb.setAPGain(smoothedDiffusion[channel]);
+        d_dryWet = smoothedDryWet[channel];
         
         for( int i=0; i< totalNumInputChannels; ++i) {
             
-            float x = buffer[i];
+            float x = buffer.getSample(channel, i);
             
             float y = schroederReverb.processSample(x, channel);
+            
+            float z = ( (float)(1- (d_dryWet) * x ) + (float)( d_dryWet * y ) );
+            
+            buffer.setSample(channel, i, z);
             
         }
     }
