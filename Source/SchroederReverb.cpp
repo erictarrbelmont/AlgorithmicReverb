@@ -10,6 +10,7 @@
 
 #include "SchroederReverb.h"
 
+
 float SchroederReverb::processSample (float x, const int channel) {
     
     // Work in progress
