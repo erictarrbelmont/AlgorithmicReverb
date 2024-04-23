@@ -10,12 +10,7 @@
 
 #include "SchroederReverb.h"
 
-<<<<<<< Updated upstream
-void processSample (float x, const int c) {
-=======
-
-float SchroederReverb::processSample (float x, const int channel) { // may need to implement the set
->>>>>>> Stashed changes
+float SchroederReverb::processSample (float x, const int channel) {
     
     // Work in progress
     
@@ -46,13 +41,10 @@ float SchroederReverb::processSample (float x, const int channel) { // may need 
     
 }
 
-float SchroederReverb::process (float * buffer, const int N, const int c) {
+void SchroederReverb::process (float * buffer, const int N, const int c) {
     for (int n = 0 ; n < N ; n++) {
         float x = buffer[n];
-        float y = processSample(x, c);
-<<<<<<< Updated upstream
-=======
-        return y;
+        float y = processSample(x,c);
+        buffer[n] = y;
     }
->>>>>>> Stashed changes
 }

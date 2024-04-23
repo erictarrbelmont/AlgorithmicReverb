@@ -7,6 +7,10 @@
 
 #include "FractionalDelay.hpp"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+
 
 FractionalDelay::FractionalDelay(){
 }
