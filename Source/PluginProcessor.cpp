@@ -9,7 +9,10 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-const juce::StringRef SchroederReverb::temp = "temp";
+const juce::StringRef AlgorithmicReverbAudioProcessor::s_DryWet = "Dry/Wet";
+const juce::StringRef AlgorithmicReverbAudioProcessor::s_ReverbTime = "Reverb Time";
+const juce::StringRef AlgorithmicReverbAudioProcessor::s_Diffusion = "Diffusion";
+const juce::StringRef AlgorithmicReverbAudioProcessor::s_LPF = "LPF";
 
 //==============================================================================
 AlgorithmicReverbAudioProcessor::AlgorithmicReverbAudioProcessor()
@@ -21,7 +24,7 @@ AlgorithmicReverbAudioProcessor::AlgorithmicReverbAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
 #endif
 apvts(*this, nullptr, "Params", createParams())
 {
@@ -31,11 +34,17 @@ AlgorithmicReverbAudioProcessor::~AlgorithmicReverbAudioProcessor()
 {
 }
 
-juce::AudioProcessorValueTreeState::ParameterLayout SchroederReverb::createParams()
+juce::AudioProcessorValueTreeState::ParameterLayout AlgorithmicReverbAudioProcessor::createParams()
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
     
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{temp, ParameterVersionHint}, "Low Threshold", -96.f, 0.f, 0.f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{s_DryWet, ParameterVersionHint}, "Dry/Wet", 0.f, 100.f, 100.f));
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{s_ReverbTime, ParameterVersionHint}, "Reverb Time", 0.f, 10.f, 0.f));
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{s_Diffusion, ParameterVersionHint}, "Diffusion", 0.f, 100.f, 100.f));
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{s_LPF, ParameterVersionHint}, "LPF", 20.f, 20000.f, 20000.f));
     
     return {params.begin(), params.end()};
     
@@ -109,6 +118,8 @@ void AlgorithmicReverbAudioProcessor::changeProgramName (int index, const juce::
 void AlgorithmicReverbAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     schroederReverb.prepare(sampleRate);
+    
+    alpha = std::exp(-std::log(9.f) / (sampleRate * responseTime) );
 }
 
 void AlgorithmicReverbAudioProcessor::releaseResources()
@@ -149,29 +160,35 @@ void AlgorithmicReverbAudioProcessor::processBlock (juce::AudioBuffer<float>& bu
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
+    
     
     auto numSamples = buffer.getNumSamples();
     
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
-
-        schroederReverb.process(channelData, numSamples, channel);
+        
+        smoothedReverbTime[channel] = alpha * smoothedReverbTime[channel] + (1.f - alpha) * schroederReverb.FBGain;
+        
+        schroederReverb.setFBGain(smoothedReverbTime[channel]);
+        
+        smoothedDiffusion[channel] = alpha * smoothedDiffusion[channel] + (1.f - alpha) * schroederReverb.APGain;
+        
+        schroederReverb.setAPGain(smoothedDiffusion[channel]);
+        
+        smoothedDryWet[channel] = alpha * smoothedDryWet[channel] + (1.f - alpha) * schroederReverb.APGain;
+        
+        schroederReverb.setAPGain(smoothedDiffusion[channel]);
+        
+        for( int i=0; i< totalNumInputChannels; ++i) {
+            
+            float x = buffer[i];
+            
+            float y = schroederReverb.processSample(x, channel);
+            
+        }
     }
 }
 

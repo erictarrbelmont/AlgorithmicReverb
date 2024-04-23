@@ -56,18 +56,36 @@ public:
 
     juce::AudioProcessorValueTreeState apvts;
     
-    static const juce::StringRef temp;
+    static const juce::StringRef s_DryWet;
+    static const juce::StringRef s_ReverbTime;
+    static const juce::StringRef s_Diffusion;
+    static const juce::StringRef s_LPF;
     
     void tempChanged(float value, int channel);
     
     
 private:
     
+  //  juce::SharedResourcePointer<SharedImages>     m_pSharedImagesPtr;
+    
     SchroederReverb schroederReverb;
     
     juce::AudioProcessorValueTreeState::ParameterLayout createParams();
     
     int ParameterVersionHint = 1;
+    
+    float smoothedReverbTime[2] = {0.f};
+    
+    float smoothedDiffusion[2] = {0.f};
+    
+    float smoothedDryWet[2] = {0.f};
+    
+    float smoothedLPF[2] = {0.f};
+    
+    float alpha = 0.999f;
+    
+    float responseTime = 0.05f;
+    
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AlgorithmicReverbAudioProcessor)
