@@ -40,9 +40,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout AlgorithmicReverbAudioProces
     
     params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{s_DryWet, ParameterVersionHint}, "Dry/Wet", 0.f, 100.f, 100.f));
     
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{s_ReverbTime, ParameterVersionHint}, "Reverb Time", 0.f, 10.f, 0.f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{s_ReverbTime, ParameterVersionHint}, "Reverb Time", 0.f, 0.9f, 0.5f));
     
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{s_Diffusion, ParameterVersionHint}, "Diffusion", 0.f, 100.f, 100.f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{s_Diffusion, ParameterVersionHint}, "Diffusion", 0.f, 0.9f, 0.5f));
     
     params.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{s_LPF, ParameterVersionHint}, "LPF", 20.f, 20000.f, 20000.f));
     
@@ -166,7 +166,7 @@ void AlgorithmicReverbAudioProcessor::processBlock (juce::AudioBuffer<float>& bu
     
     auto numSamples = buffer.getNumSamples();
     
-    double d_dryWet = dryWet / 100;
+    double d_dryWet = dryWet / 100.0;
     
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
@@ -190,7 +190,7 @@ void AlgorithmicReverbAudioProcessor::processBlock (juce::AudioBuffer<float>& bu
             
             float y = schroederReverb.processSample(x, channel);
             
-            float z = ( (float)(1- (d_dryWet) * x ) + (float)( d_dryWet * y ) );
+            float z = ( (float)((1- d_dryWet) * x ) + (float)( d_dryWet * y ) );
             
             buffer.setSample(channel, i, z);
             
