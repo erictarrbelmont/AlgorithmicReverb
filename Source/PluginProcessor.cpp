@@ -166,25 +166,23 @@ void AlgorithmicReverbAudioProcessor::processBlock (juce::AudioBuffer<float>& bu
     
     auto numSamples = buffer.getNumSamples();
     
-    double d_dryWet = dryWet / 100.0;
+    double d_dryWet = *apvts.getRawParameterValue(AlgorithmicReverbAudioProcessor::s_DryWet) / 100.0;
     
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer (channel);
         
-        smoothedReverbTime[channel] = alpha * smoothedReverbTime[channel] + (1.f - alpha) * schroederReverb.FBGain;
-        
         schroederReverb.setFBGain(smoothedReverbTime[channel]);
-        
-        smoothedDiffusion[channel] = alpha * smoothedDiffusion[channel] + (1.f - alpha) * schroederReverb.APGain;
         
         schroederReverb.setAPGain(smoothedDiffusion[channel]);
         
-        smoothedDryWet[channel] = alpha * smoothedDryWet[channel] + (1.f - alpha) * d_dryWet;
-        
-        d_dryWet = smoothedDryWet[channel];
-        
-        for( int i=0; i< totalNumInputChannels; ++i) {
+        for( int i=0; i < numSamples; ++i) {
+            
+            smoothedReverbTime[channel] = alpha * smoothedReverbTime[channel] + (1.f - alpha) * *apvts.getRawParameterValue(AlgorithmicReverbAudioProcessor::s_ReverbTime);
+            
+            smoothedDiffusion[channel] = alpha * smoothedDiffusion[channel] + (1.f - alpha) * *apvts.getRawParameterValue(AlgorithmicReverbAudioProcessor::s_Diffusion);
+      
+            smoothedDryWet[channel] = alpha * smoothedDryWet[channel] + (1.f - alpha) * d_dryWet;
             
             float x = buffer.getSample(channel, i);
             

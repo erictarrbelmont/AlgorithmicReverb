@@ -21,6 +21,7 @@ float SchroederReverb::processSample (float x, const int channel) {
     thirdDelayBlock.setGain(FBGain);
     fourthDelayBlock.setGain(FBGain);
     
+    
     // Processing the sample through each of the FBCF blocks in parallel
 
     float a = firstDelayBlock.processSample(x, channel);
